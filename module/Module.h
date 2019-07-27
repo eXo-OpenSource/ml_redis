@@ -10,8 +10,6 @@
 struct lua_State;
 class ILuaModuleManager;
 
-using redis_client = cpp_redis::client;
-
 class Module
 {
 public:
