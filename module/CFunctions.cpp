@@ -141,8 +141,8 @@ int CFunctions::redis_test(lua_State* lua_vm)
 			lua_pushboolean(lua_vm, false);
 			return 1;
 		}
-		
-		lua_pushboolean(lua_vm, true);
+
+		lua_pushboolean(lua_vm, client->is_connected());
 		return 1;
 	} catch(std::exception& e)
 	{
