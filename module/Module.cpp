@@ -1,10 +1,5 @@
-#include "Module.h"
-#include <ostream>
-#include <iostream>
-#include <cpp_redis/core/reply.hpp>
 #include <cpp_redis/core/client.hpp>
-#include <tacopie/network/tcp_socket.hpp>
-
+#include "Module.h"
 Module* g_Module = nullptr;
 
 constexpr std::size_t kNumWorkers = 2;

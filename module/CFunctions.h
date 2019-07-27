@@ -1,8 +1,9 @@
 #pragma once
-#include "extra/CLuaArguments.h"
 #include <iostream>
 #include <cpp_redis/core/reply.hpp>
 #include <cpp_redis/core/client.hpp>
+
+#include "extra/CLuaArguments.h"
 
 class ILuaModuleManager10;
 struct lua_State;
@@ -42,5 +43,7 @@ public:
 	}
 
 	static int redis_create_client(lua_State* lua_vm);
+	static int redis_connect(lua_State* lua_vm);
+	static int redis_disconnect(lua_State* lua_vm);
 	static int redis_test(lua_State* lua_vm);
 };
