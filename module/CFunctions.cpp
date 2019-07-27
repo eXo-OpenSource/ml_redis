@@ -116,6 +116,17 @@ int CFunctions::redis_test(lua_State* lua_vm)
 			lua_pushboolean(lua_vm, false);
 			return 1;
 		}
+		
+
+		client->set({ { "a", "a" }, { "b", "b" }, { "c", "c" }, { "d", "d" } }, [](const std::string& key, cpp_redis::reply& reply)
+		{
+			std::cout << key << " : " << reply << std::endl;
+		});
+
+		client->get({ "a", "b", "c", "d" }, [](const std::string& key, cpp_redis::reply& reply)
+		{
+			std::cout << key << " : " << reply << std::endl;
+		});
 
 		lua_pushboolean(lua_vm, true);
 		return 1;

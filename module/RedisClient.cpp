@@ -50,6 +50,18 @@ void redis_client::set(const std::string& key, const std::string& value,
 	_client->commit();
 }
 
+void redis_client::set(const std::map<std::string, std::string>& pairs, const std::function<void(const std::string&, cpp_redis::reply &)>& callback) const
+{
+	for(auto& [key, value]: pairs)
+	{
+		_client->set(key, value, [key, callback](cpp_redis::reply& reply)
+		{
+			callback(key, reply);
+		});
+	}
+	_client->commit();
+}
+
 cpp_redis::reply redis_client::get(const std::string& key) const
 {
 	auto result = _client->get(key);
@@ -62,5 +74,17 @@ cpp_redis::reply redis_client::get(const std::string& key) const
 void redis_client::get(const std::string& key, const cpp_redis::client::reply_callback_t& callback) const
 {
 	_client->get(key, callback);
+	_client->commit();
+}
+
+void redis_client::get(const std::list<std::string>& keys, const std::function<void(const std::string&, cpp_redis::reply &)>& callback) const
+{
+	for (auto& key : keys)
+	{
+		_client->get(key, [key, callback](cpp_redis::reply& reply)
+		{
+			callback(key, reply);
+		});
+	}
 	_client->commit();
 }
