@@ -27,3 +27,5 @@ project "test"
 		links { "cpp_redis_64.lib" }
 
 	filter "system:linux"
+		links { "tacopie.a" }
+		links { "cpp_redis.a" }

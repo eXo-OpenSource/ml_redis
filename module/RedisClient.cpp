@@ -3,7 +3,7 @@
 
 redis_client::redis_client()
 {
-	_client = new cpp_redis::client();
+	_client     = new cpp_redis::client();
 	_subscriber = new cpp_redis::subscriber();
 
 	g_Module->AddRedisClient(this);

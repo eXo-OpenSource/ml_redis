@@ -35,6 +35,8 @@ project "module"
 		debugcommand "../mta-server/MTA Server64.exe"
 
 	filter "system:linux"
+		links { "tacopie.a" }
+		links { "cpp_redis.a" }
 
 	filter "system:not linux"
 		excludes { "luaimports/luaimports.linux.h", "luaimports/luaimports.linux.cpp" }
