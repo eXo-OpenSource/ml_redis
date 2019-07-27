@@ -9,7 +9,7 @@ int CFunctions::redis_create_client(lua_State* lua_vm)
 {
 	// redis_client redis_create_client()
 	try {
-		const auto client = new RedisClient();
+		const auto client = new redis_client();
 		g_Module->AddRedisClient(client);
 
 		lua_pushlightuserdata(lua_vm, static_cast<void*>(client));
@@ -37,7 +37,7 @@ int CFunctions::redis_connect(lua_State* lua_vm)
 	try
 	{
 		// Read arguments
-		const auto client = static_cast<RedisClient*>(lua_touserdata(lua_vm, 1));
+		const auto client = static_cast<redis_client*>(lua_touserdata(lua_vm, 1));
 		const auto host = lua_tostring(lua_vm, 2);
 		const auto port = lua_tonumber(lua_vm, 3);
 
@@ -74,7 +74,7 @@ int CFunctions::redis_disconnect(lua_State* lua_vm)
 
 	try {
 		// Read arguments
-		const auto client = static_cast<RedisClient*>(lua_touserdata(lua_vm, 1));
+		const auto client = static_cast<redis_client*>(lua_touserdata(lua_vm, 1));
 
 		// verify client
 		if (!g_Module->HasRedisClient(client))
@@ -108,7 +108,7 @@ int CFunctions::redis_test(lua_State* lua_vm)
 	try
 	{
 		// Read arguments
-		const auto client = static_cast<RedisClient*>(lua_touserdata(lua_vm, 1));
+		const auto client = static_cast<redis_client*>(lua_touserdata(lua_vm, 1));
 
 		// verify client
 		if (!g_Module->HasRedisClient(client))
@@ -117,7 +117,6 @@ int CFunctions::redis_test(lua_State* lua_vm)
 			return 1;
 		}
 
-		std::cout << (client->is_connected() ? "true" : "false") << std::endl;
 		lua_pushboolean(lua_vm, true);
 		return 1;
 	} catch(std::exception& e)
