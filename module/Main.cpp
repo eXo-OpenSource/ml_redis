@@ -46,11 +46,12 @@ MTAEXPORT void RegisterFunctions(lua_State* lua_vm)
 	pModuleManager->RegisterFunction(lua_vm, "redisTest",			&CFunctions::Test);
 
 	// Register globals
-	pModuleManager->RegisterFunction(lua_vm, "redisTest",           &CFunctions::Test);
-	pModuleManager->RegisterFunction(lua_vm, "redis_create_client", &CFunctions::redis_create_client);
-	pModuleManager->RegisterFunction(lua_vm, "redis_connect",       &CFunctions::redis_connect);
-	pModuleManager->RegisterFunction(lua_vm, "redis_disconnect",    &CFunctions::redis_disconnect);
-	pModuleManager->RegisterFunction(lua_vm, "redis_test",          &CFunctions::redis_test);
+	pModuleManager->RegisterFunction(lua_vm, "redisTest",             &CFunctions::Test);
+	pModuleManager->RegisterFunction(lua_vm, "redis_create_client",   &CFunctions::redis_create_client);
+	pModuleManager->RegisterFunction(lua_vm, "redis_client_destruct", &CFunctions::redis_client_destruct);
+	pModuleManager->RegisterFunction(lua_vm, "redis_connect",         &CFunctions::redis_connect);
+	pModuleManager->RegisterFunction(lua_vm, "redis_disconnect",      &CFunctions::redis_disconnect);
+	pModuleManager->RegisterFunction(lua_vm, "redis_test",            &CFunctions::redis_test);
 }
 
 MTAEXPORT bool DoPulse()

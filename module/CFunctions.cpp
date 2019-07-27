@@ -24,6 +24,31 @@ int CFunctions::redis_create_client(lua_State* lua_vm)
 	}
 }
 
+int CFunctions::redis_client_destruct(lua_State* lua_vm)
+{
+	// bool redis_client_destruct(redis_client client)
+	if (lua_type(lua_vm, 1) != LUA_TLIGHTUSERDATA)
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ redis_client_destruct.\n");
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
+
+	const auto client = static_cast<redis_client*>(lua_touserdata(lua_vm, 1));
+
+	// verify client
+	if (!g_Module->HasRedisClient(client))
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ redis_client_destruct, invalid client has been passed.");
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
+
+	delete client;
+	lua_pushboolean(lua_vm, true);
+	return 1;
+}
+
 int CFunctions::redis_connect(lua_State* lua_vm)
 {
 	// bool redis_connect(redis_client client, string host, number port)
