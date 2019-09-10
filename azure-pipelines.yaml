@@ -17,7 +17,7 @@ stages:
     - publish: '$(Build.SourcesDirectory)/Bin/Release/ml_redis.so'
       artifact: 'ml_redis_linux'
     - publish: '$(Build.SourcesDirectory)/install-deps.sh'
-    artifact: 'ml_redis_linux'
+      artifact: 'ml_redis_linux'
   - job: Windows
     pool:
       vmImage: 'windows-2019'
