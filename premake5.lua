@@ -1,7 +1,7 @@
 solution "Redis"
 	configurations { "Debug", "Release" }
 	location ( "Build" )
-	startproject "test"
+	startproject "module"
 	targetdir "Bin/%{cfg.buildcfg}"
 
 	platforms { "x86", "x64" }
@@ -20,4 +20,4 @@ solution "Redis"
 		optimize "On"
 
 	include "module"
-	include "test"
+	--include "test"

@@ -8,7 +8,6 @@ project "test"
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
-		["Test files"] = "**.json",
 		["*"] = "premake5.lua"
 	}
 
@@ -27,5 +26,5 @@ project "test"
 		links { "cpp_redis_64.lib" }
 
 	filter "system:linux"
-		links { "tacopie.a" }
-		links { "cpp_redis.a" }
+		links { "tacopie" }
+		links { "cpp_redis" }

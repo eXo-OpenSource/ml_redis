@@ -5,8 +5,12 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
+    - checkout: self
+      submodules: true
     - script: chmod +x utils/premake5 && utils/premake5 gmake
       displayName: 'Generate Makefile'
+    - script: chmod +x install-deps.sh && ./install-deps.sh
+      displayName: 'Install cpp_redis and tacopie'
     - script: cd Build && make -j 3 CXX=g++-7 CC=gcc-7 config=release_x64
       displayName: 'Build project'
     - script: mv $(Build.SourcesDirectory)/Bin/Release/libml_redis.so $(Build.SourcesDirectory)/Bin/Release/ml_redis.so
@@ -23,7 +27,7 @@ stages:
         x64:
           platform: 'x64'
     variables:
-      solution: 'Build/JWT.sln'
+      solution: 'Build/Redis.sln'
       buildConfiguration: 'Release'
     steps:
     - script: utils\premake5 vs2019
