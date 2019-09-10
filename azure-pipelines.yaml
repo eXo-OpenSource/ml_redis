@@ -23,7 +23,7 @@ stages:
         x64:
           platform: 'x64'
     variables:
-      solution: 'Build/JWT.sln'
+      solution: 'Build/Redis.sln'
       buildConfiguration: 'Release'
     steps:
     - script: utils\premake5 vs2019
