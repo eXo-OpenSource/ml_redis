@@ -17,6 +17,16 @@ redis_client::~redis_client()
 	delete _subscriber;
 }
 
+void redis_client::authenticate(const std::string& password, const cpp_redis::client::reply_callback_t& client_callback,
+	const cpp_redis::client::reply_callback_t& subscriber_callback) const
+{
+	_client->auth(password, client_callback);
+	_subscriber->auth(password, subscriber_callback);
+
+	_client->commit();
+	_subscriber->commit();
+}
+
 cpp_redis::reply redis_client::set(const std::string& key, const std::string& value) const
 {
 	auto result = _client->set(key, value);

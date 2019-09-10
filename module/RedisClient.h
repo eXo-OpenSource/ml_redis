@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <list>
 #include <cpp_redis/core/client.hpp>
 #include <cpp_redis/core/subscriber.hpp>
 
@@ -11,6 +12,7 @@ public:
 	void connect(const std::string& host, const int& port) const { _client->connect(host, port); _subscriber->connect(host, port); }
 	void disconnect() const { _client->disconnect(); _subscriber->disconnect(); }
 	[[nodiscard]] bool is_connected() const { return _client->is_connected() && _subscriber->is_connected(); }
+	void authenticate(const std::string& password, const cpp_redis::client::reply_callback_t& client_callback, const cpp_redis::client::reply_callback_t& subscriber_callback) const;
 
 	// Key, Value
 	[[nodiscard]] cpp_redis::reply set(const std::string& key, const std::string& value) const;
