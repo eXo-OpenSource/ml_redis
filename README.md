@@ -5,6 +5,7 @@
 1. Download and install the EditorConfig plugin for Visual Studio: [https://github.com/editorconfig/editorconfig-visualstudio#readme](https://github.com/editorconfig/editorconfig-visualstudio#readme)
 2. Launch `premake.bat`
 3. Open `Build/Redis.sln`
+4. Update configuration `x64` to use compiler option `/bigobj` (See more: [VS /bigobj](https://docs.microsoft.com/en-us/cpp/build/reference/bigobj-increase-number-of-sections-in-dot-obj-file?view=vs-2019#to-set-this-compiler-option-in-the-visual-studio-development-environment))
 
 ### Debugging
 1. Create a directory junktion to MTA-Server directory in the root of the repo
@@ -20,12 +21,6 @@
 2. Add `<module src="ml_redis.dll"/>` (or `.so` for Linux) to your `mtaserver.conf`.
 3. Start the server
 
-### Linux
-In order to run the module you'll need to compile and install `cpp_redis` yourself.  
-See [https://github.com/Cylix/cpp_redis/wiki/Mac-&-Linux-Install](https://github.com/Cylix/cpp_redis/wiki/Mac-&-Linux-Install) on how to do that.
-
-## Depdencies
-* https://github.com/cpp-redis/cpp_redis
 
 ## API
 ## Globals
