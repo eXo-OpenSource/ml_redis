@@ -51,9 +51,8 @@ int CFunctions::redis_create_client(lua_State* lua_vm)
 			} else {
 				lua_pushboolean(lua_vm, false);
 			}
-		} catch(std::bad_any_cast& e)
+		} catch(std::bad_any_cast&)
 		{
-			printf(e.what());
 			lua_pushboolean(lua_vm, false);
 		}
 
@@ -154,7 +153,7 @@ int CFunctions::redis_connect(lua_State* lua_vm)
 			} else {
 				lua_pushboolean(lua_vm, false);
 			}
-		} catch(std::bad_any_cast& e)
+		} catch(std::bad_any_cast&)
 		{
 			lua_pushboolean(lua_vm, false);
 		}
@@ -227,7 +226,7 @@ int CFunctions::redis_disconnect(lua_State* lua_vm)
 			} else {
 				lua_pushboolean(lua_vm, false);
 			}
-		} catch(std::bad_any_cast& e)
+		} catch(std::bad_any_cast&)
 		{
 			lua_pushboolean(lua_vm, false);
 		}
@@ -307,7 +306,7 @@ int CFunctions::redis_set(lua_State* lua_vm)
 			} else {
 				lua_pushboolean(lua_vm, false);
 			}
-		} catch(std::bad_any_cast& e)
+		} catch(std::bad_any_cast&)
 		{
 			lua_pushboolean(lua_vm, false);
 		}
@@ -386,7 +385,7 @@ int CFunctions::redis_get(lua_State* lua_vm)
 			} else {
 				lua_pushboolean(lua_vm, false);
 			}
-		} catch(std::bad_any_cast& e)
+		} catch(std::bad_any_cast&)
 		{
 			lua_pushboolean(lua_vm, false);
 		}
