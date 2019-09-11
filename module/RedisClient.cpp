@@ -36,7 +36,7 @@ cpp_redis::reply redis_client::set(const std::string& key, const std::string& va
 	return result.get();
 }
 
-void redis_client::set(const std::map<std::string, std::string>& pairs, const std::function<void(const std::string&, cpp_redis::reply &)>& callback) const
+void redis_client::set(const std::map<std::string, std::string>& pairs, const std::function<void(const std::string&, cpp_redis::reply&)>& callback) const
 {
 	for(auto& [key, value] : pairs)
 	{
