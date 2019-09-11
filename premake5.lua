@@ -2,7 +2,7 @@ solution "Redis"
 	configurations { "Debug", "Release" }
 	location ( "Build" )
 	startproject "module"
-	targetdir "Bin/%{cfg.buildcfg}"
+	targetdir "Bin/%{cfg.buildcfg}/%{cfg.platform}"
 
 	platforms { "x86", "x64" }
 	pic "On"
