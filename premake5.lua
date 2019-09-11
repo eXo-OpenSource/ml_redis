@@ -21,4 +21,5 @@ solution "Redis"
 
 	include "module"
 	include "cpp_redis/cpp_redis"
+	include "cpp_redis/tacopie/tacopie"
 	--include "test"
