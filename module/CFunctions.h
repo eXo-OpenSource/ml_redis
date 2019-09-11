@@ -48,6 +48,8 @@ public:
 	static int redis_disconnect(lua_State* lua_vm);
 	static int redis_set(lua_State* lua_vm);
 	static int redis_get(lua_State* lua_vm);
-	
+	static int redis_subscribe(lua_State* lua_vm);
+	static int redis_publish(lua_State* lua_vm);
+
 	static int redis_test(lua_State* lua_vm);
 };
