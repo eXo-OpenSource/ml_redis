@@ -4,7 +4,7 @@ project "module"
 	kind "SharedLib"
 	targetname "ml_redis"
 	
-	includedirs { "include" }
+	includedirs { "include", "../cpp_redis/includes" }
 	libdirs { "lib" }
 
 	dependson { "cpp_redis" }
