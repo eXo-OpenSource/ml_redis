@@ -30,6 +30,8 @@ stages:
       solution: 'Build/Redis.sln'
       buildConfiguration: 'Release'
     steps:
+    - checkout: self
+      submodules: 'recursive'
     - script: utils\premake5 vs2019
       displayName: 'Create Visual Studio 2019 Solution'
     - task: VSBuild@1
