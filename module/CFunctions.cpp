@@ -1,5 +1,6 @@
 #include "Module.h"
 #include "CFunctions.h"
+#include "Utils.h"
 
 #ifndef _WIN32
 	#include <sys/stat.h>
@@ -66,6 +67,54 @@ int CFunctions::redis_create_client(lua_State* lua_vm)
 	return 1;
 }
 
+template<class _Type>
+_Type* luaL_checkobject(lua_State* lua_vm, const char* metatable_name)
+{
+	return *static_cast<_Type**>(luaL_checkudata(lua_vm, 1, metatable_name)); // get and verify our heap ptr and dereference it
+}
+
+
+int CFunctions::redis_create_client_new(lua_State* lua_vm)
+{
+	const auto client = static_cast<ml_redis::redis_client**>(lua_newuserdata(lua_vm, sizeof(ml_redis::redis_client*))); // Allocate space for a ptr to our redis_client heap ptr
+	*client = new ml_redis::redis_client; // allocate the redis_client on the heap and assign it to our userdata
+
+	luaL_getmetatable(lua_vm, "RedisClient"); // assign our redis_client metatable to our userdata
+	lua_setmetatable(lua_vm, -2);
+
+	return 1;
+}
+
+int CFunctions::redis_client_destruct_new(lua_State* lua_vm)
+{
+	const auto client = luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	delete client;
+	
+	return 0;
+}
+
+int CFunctions::redis_connect_new(lua_State* lua_vm)
+{
+	const auto client = luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto port   = luaL_checknumber(lua_vm, 2);
+	const auto host   = luaL_checkstring(lua_vm, 3);
+	
+	try
+	{
+		client->connect(host, port);
+		lua_pushboolean(lua_vm, true);
+	} catch (std::exception& e)
+	{
+		stringstream ss;
+		ss << "Failed to connect to redis server. [" << e.what() << "]\n";
+		pModuleManager->ErrorPrintf(ss.str().c_str());
+			
+		lua_pushboolean(lua_vm, false);
+	}
+	
+	return 1;
+}
+
 int CFunctions::redis_client_destruct(lua_State* lua_vm)
 {
 	// bool redis_client_destruct(redis_client client)
@@ -110,7 +159,7 @@ int CFunctions::redis_connect(lua_State* lua_vm)
 	const auto client = static_cast<ml_redis::redis_client*>(lua_touserdata(lua_vm, 2));
 	const auto host   = lua_tostring(lua_vm, 3);
 	const auto port   = lua_tonumber(lua_vm, 4);
-
+	
 	// verify client
 	if (!g_Module->HasRedisClient(client))
 	{
@@ -436,7 +485,8 @@ int CFunctions::redis_subscribe(lua_State* lua_vm)
 
 		// Push stored reference to callback function to the stack
 		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
-		
+
+		// Push results from redis to the stack
 		lua_pushstring(lua_vm, channel.c_str());
 		lua_pushstring(lua_vm, message.c_str());
 		
@@ -469,7 +519,7 @@ int CFunctions::redis_publish(lua_State* lua_vm)
 	const auto client = static_cast<ml_redis::redis_client*>(lua_touserdata(lua_vm, 2));
 	const auto channel = lua_tostring(lua_vm, 3);
 	const auto message = lua_tostring(lua_vm, 4);
-
+	
 	// verify client
 	if (!g_Module->HasRedisClient(client))
 	{

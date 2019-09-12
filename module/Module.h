@@ -30,7 +30,8 @@ public:
 	inline JobManager<const std::optional<std::any>>& GetJobManager() { return _jobManager; }
 
 	static void register_lua_table_function(lua_State* lua_vm, const char* function_name, lua_CFunction function);
-
+	static void register_redis_class(lua_State* lua_vm);
+	
 private:
 	ILuaModuleManager* _moduleManager;
 	JobManager<const std::optional<std::any>> _jobManager;

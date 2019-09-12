@@ -45,14 +45,19 @@ MTAEXPORT void RegisterFunctions(lua_State* lua_vm)
 	// Register functions
 	pModuleManager->RegisterFunction(lua_vm, "redisTest",			&CFunctions::Test);
 
-	// Register globals
+	// Register lua class
+	Module::register_redis_class(lua_vm);
+	
 	lua_newtable(lua_vm);
 		Module::register_lua_table_function(lua_vm, "create",			&CFunctions::redis_create_client);
 		Module::register_lua_table_function(lua_vm, "destroy",		&CFunctions::redis_client_destruct);
+	
 		Module::register_lua_table_function(lua_vm, "connect",		&CFunctions::redis_connect);
 		Module::register_lua_table_function(lua_vm, "disconnect",		&CFunctions::redis_disconnect);
+	
 		Module::register_lua_table_function(lua_vm, "set",			&CFunctions::redis_set);
 		Module::register_lua_table_function(lua_vm, "get",			&CFunctions::redis_get);
+	
 		Module::register_lua_table_function(lua_vm, "subscribe",		&CFunctions::redis_subscribe);
 		Module::register_lua_table_function(lua_vm, "publish",		&CFunctions::redis_publish);
 	
