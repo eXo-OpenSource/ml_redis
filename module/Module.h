@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <any>
 #include <optional>
+#include <cstring>
 
 #include "ILuaModuleManager.h"
 #include "JobManager.h"
