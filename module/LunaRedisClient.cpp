@@ -69,7 +69,7 @@ int LunaRedisClient::set(lua_State* lua_vm)
 	if (!g_Module->HasRedisClient(_client))
 		luaL_argerror(lua_vm, 1, "invalid client has been passed");
 
-	g_Module->GetJobManager().PushTask([lua_vm, client = _client, key, value]() -> const std::optional<std::any>
+	g_Module->GetJobManager().PushTask([client = _client, key, value]() -> const std::optional<std::any>
 	{
 		try {
 			return client->set(key, value);
@@ -131,7 +131,7 @@ int LunaRedisClient::get(lua_State* lua_vm)
 	if (!g_Module->HasRedisClient(_client))
 		luaL_argerror(lua_vm, 1, "invalid client has been passed");
 
-	g_Module->GetJobManager().PushTask([lua_vm, client = _client, key]() -> const std::optional<std::any>
+	g_Module->GetJobManager().PushTask([client = _client, key]() -> const std::optional<std::any>
 	{
 		try {
 			return client->get(key);
