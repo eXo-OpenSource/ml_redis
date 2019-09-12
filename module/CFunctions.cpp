@@ -70,14 +70,14 @@ int CFunctions::redis_create_client(lua_State* lua_vm)
 int CFunctions::redis_create_client_new(lua_State* lua_vm)
 {
 	const auto client = new ml_redis::redis_client();
-	utils::luaL_createobject(lua_vm, client, "RedisClient");
+	utils::lua_createobject(lua_vm, client, "RedisClient");
 
 	return 1;
 }
 
 int CFunctions::redis_client_destruct_new(lua_State* lua_vm)
 {
-	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto client = utils::lua_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	delete client;
 	
 	return 0;
@@ -86,10 +86,10 @@ int CFunctions::redis_client_destruct_new(lua_State* lua_vm)
 int CFunctions::redis_connect_new(lua_State* lua_vm)
 {
 	// Save function ref
-	const auto func_ref = utils::luaL_getfuncref(lua_vm, 2);
+	const auto func_ref = utils::lua_getfuncref(lua_vm, 2);
 	
 	// Read arguments
-	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto client = utils::lua_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	const auto host   = luaL_checkstring(lua_vm, 3);
 	const auto port   = luaL_checknumber(lua_vm, 4);
 	
@@ -416,10 +416,10 @@ int CFunctions::redis_set_new(lua_State* lua_vm)
 	}
 
 	// Save function ref
-	const auto func_ref = utils::luaL_getfuncref(lua_vm, 2);
+	const auto func_ref = utils::lua_getfuncref(lua_vm, 2);
 	
 	// Read arguments
-	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto client = utils::lua_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	const auto key    = lua_tostring(lua_vm, 3);
 	const auto value  = lua_tostring(lua_vm, 4);
 
@@ -573,10 +573,10 @@ int CFunctions::redis_get_new(lua_State* lua_vm)
 	}
 
 	// Save function ref
-	const auto func_ref = utils::luaL_getfuncref(lua_vm, 2);
+	const auto func_ref = utils::lua_getfuncref(lua_vm, 2);
 
 	// Read arguments
-	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto client = utils::lua_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	const auto key    = lua_tostring(lua_vm, 3);
 
 	// verify client

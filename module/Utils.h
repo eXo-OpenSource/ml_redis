@@ -35,7 +35,7 @@ public:
 		
 		// Save reference of the Lua callback function
 		// See: http://lua-users.org/lists/lua-l/2008-12/msg00193.html
-		lua_pushvalue(lua_vm, 2);
+		lua_pushvalue(lua_vm, index);
 		return luaL_ref(lua_vm, LUA_REGISTRYINDEX);
 	}
 	
