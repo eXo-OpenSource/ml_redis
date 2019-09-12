@@ -9,8 +9,6 @@ stages:
       submodules: 'recursive'
     - script: chmod +x utils/premake5 && utils/premake5 gmake
       displayName: 'Generate Makefile'
-    - script: chmod +x install-deps.sh && ./install-deps.sh
-      displayName: 'Install cpp_redis and tacopie'
     - script: cd Build && make -j 3 CXX=g++-7 CC=gcc-7 config=release_x64
       displayName: 'Build project'
     - script: mv $(Build.SourcesDirectory)/Bin/Release/libml_redis.so $(Build.SourcesDirectory)/Bin/Release/ml_redis.so
