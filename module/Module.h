@@ -24,9 +24,9 @@ public:
 	inline void RemoveLuaVM(lua_State* luaVM) { _luaStates.erase(luaVM); }
 	inline bool HasLuaVM(lua_State* luaVM) { return _luaStates.find(luaVM) != _luaStates.end(); }
 
-	inline void AddRedisClient(ml_redis::redis_client* client) { _redisClients.insert(client); }
-	inline void RemoveRedisClient(ml_redis::redis_client* client) { _redisClients.erase(client); }
-	inline bool HasRedisClient(ml_redis::redis_client* client) { return _redisClients.find(client) != _redisClients.end(); }
+	inline void AddRedisClient(redis_client* client) { _redisClients.insert(client); }
+	inline void RemoveRedisClient(redis_client* client) { _redisClients.erase(client); }
+	inline bool HasRedisClient(redis_client* client) { return _redisClients.find(client) != _redisClients.end(); }
 
 	inline JobManager<const std::optional<std::any>>& GetJobManager() { return _jobManager; }
 
@@ -37,7 +37,7 @@ private:
 	ILuaModuleManager* _moduleManager;
 	JobManager<const std::optional<std::any>> _jobManager;
 	std::unordered_set<lua_State*> _luaStates;
-	std::unordered_set<ml_redis::redis_client*> _redisClients;
+	std::unordered_set<redis_client*> _redisClients;
 };
 
 extern Module* g_Module;

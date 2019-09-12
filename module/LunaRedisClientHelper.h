@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "LunaRedisClient.h"
+#include "Utils.h"
 
 const char LunaRedisClient::className[] = "RedisClient";
 Luna<LunaRedisClient>::RegType LunaRedisClient::methods[] = {
@@ -18,9 +19,6 @@ Luna<LunaRedisClient>::RegType LunaRedisClient::methods[] = {
 class LunaRedisClientHelper
 {
 public:
-	static inline void Register(lua_State* lua_vm)
-	{
-		Luna<LunaRedisClient>::Register(lua_vm);
-	}
+	static inline void Register(lua_State* lua_vm) { Luna<LunaRedisClient>::Register(lua_vm); }
 };
 

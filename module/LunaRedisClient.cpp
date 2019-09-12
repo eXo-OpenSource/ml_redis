@@ -7,7 +7,7 @@
 
 LunaRedisClient::LunaRedisClient(lua_State* lua_vm)
 {
-	_client = new ml_redis::redis_client();
+	_client = new redis_client();
 }
 
 LunaRedisClient::~LunaRedisClient()

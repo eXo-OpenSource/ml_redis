@@ -6,6 +6,7 @@ struct lua_State;
 
 extern ILuaModuleManager10* pModuleManager;
 
+// http://lua-users.org/wiki/SimplerCppBinding
 class LunaRedisClient
 {
 public:
@@ -23,5 +24,5 @@ public:
 	int publish(lua_State* lua_vm);
 
 private:
-	ml_redis::redis_client* _client;
+	redis_client* _client;
 };
