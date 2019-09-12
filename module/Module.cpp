@@ -45,15 +45,17 @@ void Module::register_redis_class(lua_State* lua_vm)
 		// Methods
 		{ "new",		&CFunctions::redis_create_client_new },
 		{ "connect",	&CFunctions::redis_connect_new },
+		{ "get",		&CFunctions::redis_get_new },
+		{ "set",		&CFunctions::redis_set_new },
 		{ nullptr, nullptr }
 	};
 
 	// Register `RedisClient` metatable
 	luaL_newmetatable(lua_vm, "RedisClient");
 		lua_pushstring(lua_vm, "__index");
-		lua_pushvalue(lua_vm, -2);
+			lua_pushvalue(lua_vm, -2);
 		lua_settable(lua_vm, -3);
-		luaL_openlib(lua_vm, NULL, redis_client_regs, 0);
+	luaL_openlib(lua_vm, nullptr, redis_client_regs, 0);
 	
 	lua_setglobal(lua_vm, "RedisClient");
 }

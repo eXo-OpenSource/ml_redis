@@ -10,7 +10,35 @@ static const int index_key   = -2;
 
 class utils
 {
-public:
+public:	
+	template<class _Type>
+	static _Type* lua_checkobject(lua_State* lua_vm, const char* metatable, const int index = 1)
+	{
+		// get and verify our heap ptr and dereference it
+		return *static_cast<_Type**>(luaL_checkudata(lua_vm, index, metatable));
+	}
+
+	template<class _Type>
+	static void lua_createobject(lua_State* lua_vm, _Type* heap_object, const char* metatable)
+	{
+		const auto udata = static_cast<_Type**>(lua_newuserdata(lua_vm, sizeof(_Type*))); // Allocate space for a ptr to our heap object ptr
+		*udata = heap_object; // assign our heap object to the udata ptr
+
+		luaL_getmetatable(lua_vm, metatable); // assign the metatable to our udata
+		lua_setmetatable(lua_vm, -2);
+	}
+
+	static int lua_getfuncref(lua_State* lua_vm, const int index)
+	{
+		// Verify argument
+		luaL_checktype(lua_vm, index, LUA_TFUNCTION);
+		
+		// Save reference of the Lua callback function
+		// See: http://lua-users.org/lists/lua-l/2008-12/msg00193.html
+		lua_pushvalue(lua_vm, 2);
+		return luaL_ref(lua_vm, LUA_REGISTRYINDEX);
+	}
+	
 	static inline std::unordered_map<std::string, std::string> parse_table(lua_State* lua_vm, const int index)
 	{
 		std::unordered_map<std::string, std::string> result;

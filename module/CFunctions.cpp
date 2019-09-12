@@ -67,27 +67,17 @@ int CFunctions::redis_create_client(lua_State* lua_vm)
 	return 1;
 }
 
-template<class _Type>
-_Type* luaL_checkobject(lua_State* lua_vm, const char* metatable_name)
-{
-	return *static_cast<_Type**>(luaL_checkudata(lua_vm, 1, metatable_name)); // get and verify our heap ptr and dereference it
-}
-
-
 int CFunctions::redis_create_client_new(lua_State* lua_vm)
 {
-	const auto client = static_cast<ml_redis::redis_client**>(lua_newuserdata(lua_vm, sizeof(ml_redis::redis_client*))); // Allocate space for a ptr to our redis_client heap ptr
-	*client = new ml_redis::redis_client; // allocate the redis_client on the heap and assign it to our userdata
-
-	luaL_getmetatable(lua_vm, "RedisClient"); // assign our redis_client metatable to our userdata
-	lua_setmetatable(lua_vm, -2);
+	const auto client = new ml_redis::redis_client();
+	utils::luaL_createobject(lua_vm, client, "RedisClient");
 
 	return 1;
 }
 
 int CFunctions::redis_client_destruct_new(lua_State* lua_vm)
 {
-	const auto client = luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	delete client;
 	
 	return 0;
@@ -95,23 +85,68 @@ int CFunctions::redis_client_destruct_new(lua_State* lua_vm)
 
 int CFunctions::redis_connect_new(lua_State* lua_vm)
 {
-	const auto client = luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
-	const auto port   = luaL_checknumber(lua_vm, 2);
+	// Save function ref
+	const auto func_ref = utils::luaL_getfuncref(lua_vm, 2);
+	
+	// Read arguments
+	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	const auto host   = luaL_checkstring(lua_vm, 3);
+	const auto port   = luaL_checknumber(lua_vm, 4);
 	
-	try
+	// verify client
+	if (!g_Module->HasRedisClient(client))
 	{
-		client->connect(host, port);
-		lua_pushboolean(lua_vm, true);
-	} catch (std::exception& e)
-	{
-		stringstream ss;
-		ss << "Failed to connect to redis server. [" << e.what() << "]\n";
-		pModuleManager->ErrorPrintf(ss.str().c_str());
-			
+		pModuleManager->ErrorPrintf("Bad argument @ redis_connect, invalid client has been passed.\n");
 		lua_pushboolean(lua_vm, false);
+		return 1;
 	}
-	
+
+	g_Module->GetJobManager().PushTask([client, host, port]() -> const std::optional<std::any>
+	{	
+		try
+		{
+			client->connect(host, port);
+			
+			return true;
+		} catch(std::exception& e)
+		{
+			stringstream ss;
+			ss << "Failed to connect to redis server. [" << e.what() << "]\n";
+			pModuleManager->ErrorPrintf(ss.str().c_str());
+			
+			return {};
+		}
+	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
+	{
+		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
+		if (!g_Module->HasLuaVM(lua_vm))
+			return;
+
+		// Push stored reference to callback function to the stack
+		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
+
+		// Push the result
+		try
+		{
+			if (result.has_value())
+			{
+				const auto connect_result = std::any_cast<bool>(result.value());
+				lua_pushboolean(lua_vm, connect_result);
+			} else {
+				lua_pushboolean(lua_vm, false);
+			}
+		} catch(std::bad_any_cast&)
+		{
+			lua_pushboolean(lua_vm, false);
+		}
+
+		// Finally, call the function
+		const auto err = lua_pcall(lua_vm, 1, 0, 0);
+		if (err != 0)
+			pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
+	});
+
+	lua_pushboolean(lua_vm, true);
 	return 1;
 }
 
@@ -370,6 +405,84 @@ int CFunctions::redis_set(lua_State* lua_vm)
 	return 1;
 }
 
+int CFunctions::redis_set_new(lua_State* lua_vm)
+{
+	// bool redis_set(redis_client client, string key, string value)
+	if (lua_type(lua_vm, 2) != LUA_TFUNCTION || lua_type(lua_vm, 3) != LUA_TSTRING || lua_type(lua_vm, 4) != LUA_TSTRING)
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ redis_set.\n");
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
+
+	// Save function ref
+	const auto func_ref = utils::luaL_getfuncref(lua_vm, 2);
+	
+	// Read arguments
+	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
+	const auto key    = lua_tostring(lua_vm, 3);
+	const auto value  = lua_tostring(lua_vm, 4);
+
+	// verify client
+	if (!g_Module->HasRedisClient(client))
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ redis_set, invalid client has been passed.\n");
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
+
+	g_Module->GetJobManager().PushTask([lua_vm, client, key, value]() -> const std::optional<std::any>
+	{
+		try {
+			return client->set(key, value);
+		} catch(exception& e)
+		{
+			std::cout << e.what() << std::endl;
+			lua_pushboolean(lua_vm, false);
+			
+			return {};
+		}
+	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
+	{
+		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
+		if (!g_Module->HasLuaVM(lua_vm))
+			return;
+
+		// Push stored reference to callback function to the stack
+		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
+
+		// Push the result
+		try
+		{
+			if (result.has_value())
+			{
+				const auto reply = std::any_cast<cpp_redis::reply>(result.value());
+				if (!reply.is_error())
+				{
+					lua_pushboolean(lua_vm, true);
+				} else
+				{
+					std::cout << reply.error() << std::endl;
+					lua_pushboolean(lua_vm, false);
+				}
+			} else {
+				lua_pushboolean(lua_vm, false);
+			}
+		} catch(std::bad_any_cast&)
+		{
+			lua_pushboolean(lua_vm, false);
+		}
+
+		// Finally, call the function
+		const auto err = lua_pcall(lua_vm, 1, 0, 0);
+		if (err != 0)
+			pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
+	});
+
+	lua_pushboolean(lua_vm, true);
+	return 1;
+}
+
 int CFunctions::redis_get(lua_State* lua_vm)
 {
 	// string redis_get(redis_client client, string key)
@@ -387,6 +500,83 @@ int CFunctions::redis_get(lua_State* lua_vm)
 
 	// Read arguments
 	const auto client = static_cast<ml_redis::redis_client*>(lua_touserdata(lua_vm, 2));
+	const auto key    = lua_tostring(lua_vm, 3);
+
+	// verify client
+	if (!g_Module->HasRedisClient(client))
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ redis_get, invalid client has been passed.\n");
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
+
+	g_Module->GetJobManager().PushTask([lua_vm, client, key]() -> const std::optional<std::any>
+	{
+		try {
+			return client->get(key);
+		} catch(exception& e)
+		{
+			std::cout << e.what() << std::endl;
+			lua_pushboolean(lua_vm, false);
+			
+			return {};
+		}
+	}, [lua_vm = lua_getmainstate(lua_vm), func_ref](const std::optional<std::any>& result)
+	{
+		// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
+		if (!g_Module->HasLuaVM(lua_vm))
+			return;
+
+		// Push stored reference to callback function to the stack
+		lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
+
+		// Push the result
+		try
+		{
+			if (result.has_value())
+			{
+				const auto reply = std::any_cast<cpp_redis::reply>(result.value());
+				if (!reply.is_error())
+				{
+					lua_pushstring(lua_vm, reply.as_string().c_str());
+				} else
+				{
+					std::cout << reply.error() << std::endl;
+					lua_pushboolean(lua_vm, false);
+				}
+			} else {
+				lua_pushboolean(lua_vm, false);
+			}
+		} catch(std::bad_any_cast&)
+		{
+			lua_pushboolean(lua_vm, false);
+		}
+
+		// Finally, call the function
+		const auto err = lua_pcall(lua_vm, 1, 0, 0);
+		if (err != 0)
+			pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
+	});
+
+	lua_pushboolean(lua_vm, true);
+	return 1;
+}
+
+int CFunctions::redis_get_new(lua_State* lua_vm)
+{
+	// string redis_get(redis_client client, string key)
+	if (lua_type(lua_vm, 2) != LUA_TFUNCTION || lua_type(lua_vm, 3) != LUA_TSTRING)
+	{
+		pModuleManager->ErrorPrintf("Bad argument @ redis_get.\n");
+		lua_pushboolean(lua_vm, false);
+		return 1;
+	}
+
+	// Save function ref
+	const auto func_ref = utils::luaL_getfuncref(lua_vm, 2);
+
+	// Read arguments
+	const auto client = utils::luaL_checkobject<ml_redis::redis_client>(lua_vm, "RedisClient");
 	const auto key    = lua_tostring(lua_vm, 3);
 
 	// verify client
