@@ -42,27 +42,41 @@ MTAEXPORT void RegisterFunctions(lua_State* lua_vm)
 	// Add lua vm to states list (to check validity)
 	g_Module->AddLuaVM(lua_vm);
 
-	// Register functions
-	pModuleManager->RegisterFunction(lua_vm, "redisTest",			&CFunctions::Test);
-
 	// Register lua class
-	Module::register_redis_class(lua_vm);
+	luaL_Reg redis_client_regs[] = {
+		// metamethods
+		{ "__gc",			&CFunctions::redis_client_destruct },
+		
+		// methods
+		{ "new",			&CFunctions::redis_create_client },
+		{ "connect",		&CFunctions::redis_connect },
+		{ "disconnect",		&CFunctions::redis_disconnect },
+		{ "get",			&CFunctions::redis_get },
+		{ "set",			&CFunctions::redis_set },
+		{ "subscribe",		&CFunctions::redis_subscribe },
+		{ "publish",		&CFunctions::redis_publish },
+		{ nullptr,		nullptr }
+	};
 	
+	Module::register_class(lua_vm, "RedisClient", redis_client_regs);
+
+	/*
 	lua_newtable(lua_vm);
-		Module::register_lua_table_function(lua_vm, "create",			&CFunctions::redis_create_client);
-		Module::register_lua_table_function(lua_vm, "destroy",		&CFunctions::redis_client_destruct);
+		Module::register_table_function(lua_vm, "create",		&CFunctions::redis_create_client);
+		Module::register_table_function(lua_vm, "destroy",		&CFunctions::redis_client_destruct);
 	
-		Module::register_lua_table_function(lua_vm, "connect",		&CFunctions::redis_connect);
-		Module::register_lua_table_function(lua_vm, "disconnect",		&CFunctions::redis_disconnect);
+		Module::register_table_function(lua_vm, "connect",		&CFunctions::redis_connect);
+		Module::register_table_function(lua_vm, "disconnect",	&CFunctions::redis_disconnect);
 	
-		Module::register_lua_table_function(lua_vm, "set",			&CFunctions::redis_set);
-		Module::register_lua_table_function(lua_vm, "get",			&CFunctions::redis_get);
+		Module::register_table_function(lua_vm, "set",			&CFunctions::redis_set);
+		Module::register_table_function(lua_vm, "get",			&CFunctions::redis_get);
 	
-		Module::register_lua_table_function(lua_vm, "subscribe",		&CFunctions::redis_subscribe);
-		Module::register_lua_table_function(lua_vm, "publish",		&CFunctions::redis_publish);
+		Module::register_table_function(lua_vm, "subscribe",	&CFunctions::redis_subscribe);
+		Module::register_table_function(lua_vm, "publish",		&CFunctions::redis_publish);
 	
-		Module::register_lua_table_function(lua_vm, "test", &CFunctions::redis_test);
+		Module::register_table_function(lua_vm, "test",			&CFunctions::redis_test);
 	lua_setglobal(lua_vm, "Redis");
+	*/
 }
 
 MTAEXPORT bool DoPulse()

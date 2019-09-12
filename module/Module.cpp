@@ -27,35 +27,22 @@ void Module::Process()
 	_jobManager.SpreadResults();
 }
 
-void Module::register_lua_table_function(lua_State* lua_vm, const char* function_name, lua_CFunction function)
+void Module::register_table_function(lua_State* lua_vm, const char* function_name, lua_CFunction function)
 {
 	lua_pushstring(lua_vm, function_name);
 		lua_pushcfunction(lua_vm, function);
 	lua_settable(lua_vm, -3);
 }
 
-void Module::register_redis_class(lua_State* lua_vm)
+void Module::register_class(lua_State* lua_vm, const char* metatable, const luaL_Reg* registry)
 {
 	// https://www.lua.org/pil/28.2.html
-	// Metatable definition
-	luaL_Reg redis_client_regs[] = {
-		// Meta methods
-		{ "__gc",		&CFunctions::redis_client_destruct_new },
-		
-		// Methods
-		{ "new",		&CFunctions::redis_create_client_new },
-		{ "connect",	&CFunctions::redis_connect_new },
-		{ "get",		&CFunctions::redis_get_new },
-		{ "set",		&CFunctions::redis_set_new },
-		{ nullptr, nullptr }
-	};
-
-	// Register `RedisClient` metatable
-	luaL_newmetatable(lua_vm, "RedisClient");
+	// Register metatable
+	luaL_newmetatable(lua_vm, metatable);
 		lua_pushstring(lua_vm, "__index");
 			lua_pushvalue(lua_vm, -2);
 		lua_settable(lua_vm, -3);
-	luaL_openlib(lua_vm, nullptr, redis_client_regs, 0);
+	luaL_openlib(lua_vm, nullptr, registry, 0);
 	
-	lua_setglobal(lua_vm, "RedisClient");
+	lua_setglobal(lua_vm, metatable);
 }
