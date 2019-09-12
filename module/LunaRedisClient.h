@@ -14,6 +14,7 @@ public:
 	static Luna<LunaRedisClient>::RegType methods[];
 
 	LunaRedisClient(lua_State*);
+	~LunaRedisClient();
 	
 	void verify_self(lua_State* lua_vm) const;
 

@@ -9,11 +9,17 @@
 LunaRedisClient::LunaRedisClient(lua_State* lua_vm)
 {
 	_client = std::make_shared<redis_client>();
+	g_Module->AddRedisClient(_client);
+}
+
+LunaRedisClient::~LunaRedisClient()
+{
+	g_Module->RemoveRedisClient(_client);
 }
 
 void LunaRedisClient::verify_self(lua_State* lua_vm) const
 {
-	if (!g_Module->HasRedisClient(_client.get()))
+	if (!g_Module->HasRedisClient(_client))
 		luaL_argerror(lua_vm, 1, "invalid client has been passed");
 }
 

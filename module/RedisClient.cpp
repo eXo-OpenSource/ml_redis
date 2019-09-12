@@ -5,13 +5,6 @@ redis_client::redis_client()
 {
 	_client     = std::make_unique<cpp_redis::client>();
 	_subscriber = std::make_unique<cpp_redis::subscriber>();
-
-	g_Module->AddRedisClient(this);
-}
-
-redis_client::~redis_client()
-{
-	g_Module->RemoveRedisClient(this);
 }
 
 void redis_client::authenticate(const std::string& password, const cpp_redis::client::reply_callback_t& client_callback,

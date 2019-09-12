@@ -7,7 +7,6 @@ class redis_client
 {
 public:
 	redis_client();
-	~redis_client();
 
 	[[nodiscard]] bool validate() const { return _client != nullptr && _subscriber != nullptr; }
 	
