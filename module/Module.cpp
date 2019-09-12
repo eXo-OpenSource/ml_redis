@@ -1,6 +1,5 @@
 #include <cpp_redis/core/client.hpp>
 #include "Module.h"
-#include "CFunctions.h"
 Module* g_Module = nullptr;
 
 constexpr std::size_t kNumWorkers = 2;

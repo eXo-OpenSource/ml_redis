@@ -13,6 +13,7 @@ namespace ml_redis
 
 		[[nodiscard]] bool validate() const { return _client != nullptr && _subscriber != nullptr; }
 		
+		// redis commands
 		void connect(const std::string& host, const int& port) const { _client->connect(host, port); _subscriber->connect(host, port); }
 		void disconnect() const { _client->disconnect(); _subscriber->disconnect(); }
 		[[nodiscard]] bool is_connected() const { return _client->is_connected() && _subscriber->is_connected(); }

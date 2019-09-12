@@ -3,9 +3,10 @@
 #include <any>
 #include <optional>
 
+#include "ILuaModuleManager.h"
 #include "JobManager.h"
 #include "RedisClient.h"
-#include "ILuaModuleManager.h"
+#include "Luna.h"
 
 struct lua_State;
 class ILuaModuleManager;

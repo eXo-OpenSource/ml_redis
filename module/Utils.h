@@ -8,6 +8,8 @@
 static const int index_value = -1;
 static const int index_key   = -2;
 
+#define method(class, name) {#name, &class::name}
+
 class utils
 {
 public:	
@@ -28,6 +30,13 @@ public:
 		lua_setmetatable(lua_vm, -2);
 	}
 
+	template<class _Type>
+	static void lua_deleteobject(lua_State* lua_vm, const char* metatable, const int index = 1)
+	{
+		const auto udata = static_cast<_Type**>(luaL_checkudata(lua_vm, index, metatable));
+		delete udata;
+	}
+	
 	static int lua_getfuncref(lua_State* lua_vm, const int index)
 	{
 		// Verify argument
