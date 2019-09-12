@@ -14,15 +14,17 @@ public:
 	static Luna<LunaRedisClient>::RegType methods[];
 
 	LunaRedisClient(lua_State*);
-	~LunaRedisClient();
+	
+	void verify_self(lua_State* lua_vm) const;
 
 	int connect(lua_State* lua_vm);
 	int disconnect(lua_State* lua_vm);
 	int set(lua_State* lua_vm);
 	int get(lua_State* lua_vm);
 	int subscribe(lua_State* lua_vm);
+	int unsubscribe(lua_State* lua_vm);
 	int publish(lua_State* lua_vm);
 
 private:
-	redis_client* _client;
+	std::shared_ptr<redis_client> _client;
 };

@@ -10,6 +10,7 @@ Luna<LunaRedisClient>::RegType LunaRedisClient::methods[] = {
 	method(LunaRedisClient, get),
 	method(LunaRedisClient, set),
 	method(LunaRedisClient, subscribe),
+	method(LunaRedisClient, unsubscribe),
 	method(LunaRedisClient, publish),
 
 	// Do not remove, required

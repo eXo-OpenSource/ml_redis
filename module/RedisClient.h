@@ -38,6 +38,6 @@ public:
 	void publish(const std::map<std::string, std::string>& pairs, const std::function<void(const std::string&, cpp_redis::reply&)>& callback) const;
 
 private:
-	cpp_redis::client* _client;
-	cpp_redis::subscriber* _subscriber;
+	std::unique_ptr<cpp_redis::client> _client;
+	std::unique_ptr<cpp_redis::subscriber> _subscriber;
 };

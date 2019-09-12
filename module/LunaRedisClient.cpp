@@ -5,14 +5,16 @@
 	#include <sys/stat.h>
 #endif
 
+// ReSharper disable CppMemberFunctionMayBeConst
 LunaRedisClient::LunaRedisClient(lua_State* lua_vm)
 {
-	_client = new redis_client();
+	_client = std::make_shared<redis_client>();
 }
 
-LunaRedisClient::~LunaRedisClient()
+void LunaRedisClient::verify_self(lua_State* lua_vm) const
 {
-	delete _client;
+	if (!g_Module->HasRedisClient(_client.get()))
+		luaL_argerror(lua_vm, 1, "invalid client has been passed");
 }
 
 int LunaRedisClient::connect(lua_State* lua_vm)
@@ -22,8 +24,7 @@ int LunaRedisClient::connect(lua_State* lua_vm)
 	const auto port   = luaL_checknumber(lua_vm, 2);
 	
 	// verify client
-	if (!g_Module->HasRedisClient(_client))
-		luaL_argerror(lua_vm, 1, "invalid client has been passed");
+	verify_self(lua_vm);
 
 	try
 	{
@@ -31,8 +32,7 @@ int LunaRedisClient::connect(lua_State* lua_vm)
 		lua_pushboolean(lua_vm, true);
 	} catch (std::exception& e)
 	{
-		pModuleManager->ErrorPrintf("Failed to connect to redis server. [%s]\n", e.what());
-		lua_pushboolean(lua_vm, false);
+		luaL_error(lua_vm, "Failed to connect to redis server. [%s]\n", e.what());
 	}
 		
 	return 1;
@@ -41,16 +41,14 @@ int LunaRedisClient::connect(lua_State* lua_vm)
 int LunaRedisClient::disconnect(lua_State* lua_vm)
 {
 	// verify client
-	if (!g_Module->HasRedisClient(_client))
-		luaL_argerror(lua_vm, 1, "invalid client has been passed");
+	verify_self(lua_vm);
 
 	try {
 		_client->disconnect();
 		lua_pushboolean(lua_vm, true);
 	} catch(std::exception& e)
 	{
-		pModuleManager->ErrorPrintf("%s\n", e.what());
-		lua_pushboolean(lua_vm, false);
+		luaL_error(lua_vm, e.what());
 	}
 
 	return 1;
@@ -66,8 +64,7 @@ int LunaRedisClient::set(lua_State* lua_vm)
 	const auto value  = luaL_checkstring(lua_vm, 3);
 
 	// verify client
-	if (!g_Module->HasRedisClient(_client))
-		luaL_argerror(lua_vm, 1, "invalid client has been passed");
+	verify_self(lua_vm);
 
 	g_Module->GetJobManager().PushTask([client = _client, key, value]() -> const std::optional<std::any>
 	{
@@ -128,8 +125,7 @@ int LunaRedisClient::get(lua_State* lua_vm)
 	const auto key    = luaL_checkstring(lua_vm, 2);
 
 	// verify client
-	if (!g_Module->HasRedisClient(_client))
-		luaL_argerror(lua_vm, 1, "invalid client has been passed");
+	verify_self(lua_vm);
 
 	g_Module->GetJobManager().PushTask([client = _client, key]() -> const std::optional<std::any>
 	{
@@ -190,8 +186,7 @@ int LunaRedisClient::subscribe(lua_State* lua_vm)
 	const auto channel = lua_tostring(lua_vm, 2);
 
 	// verify client
-	if (!g_Module->HasRedisClient(_client))
-		luaL_argerror(lua_vm, 1, "invalid client has been passed");
+	verify_self(lua_vm);
 	
 	// subscribe to the channel
 	try {
@@ -217,10 +212,29 @@ int LunaRedisClient::subscribe(lua_State* lua_vm)
 		lua_pushboolean(lua_vm, true);
 	} catch(std::exception& e)
 	{
-		std::cout << e.what() << std::endl;
-		lua_pushboolean(lua_vm, false);
+		luaL_error(lua_vm, e.what());
 	}
 	
+	return 1;
+}
+	
+int LunaRedisClient::unsubscribe(lua_State* lua_vm)
+{
+	// Read arugments
+	const auto channel = luaL_checkstring(lua_vm, 1);
+
+	// verify client
+	verify_self(lua_vm);
+
+	try
+	{
+		_client->unsubscribe(channel);
+		lua_pushboolean(lua_vm, true);
+	} catch(std::exception& e)
+	{
+		luaL_error(lua_vm, e.what());
+	}
+
 	return 1;
 }
 
@@ -234,8 +248,7 @@ int LunaRedisClient::publish(lua_State* lua_vm)
 	const auto message = lua_tostring(lua_vm, 3);
 	
 	// verify client
-	if (!g_Module->HasRedisClient(_client))
-		luaL_argerror(lua_vm, 1, "invalid client has been passed");
+	verify_self(lua_vm);
 
 	g_Module->GetJobManager().PushTask([client = _client, channel, message]() -> const std::optional<std::any>
 	{
@@ -286,3 +299,4 @@ int LunaRedisClient::publish(lua_State* lua_vm)
 	lua_pushboolean(lua_vm, true);
 	return 1;
 }
+// ReSharper restore CppMemberFunctionMayBeConst
