@@ -25,9 +25,9 @@ public:
 	inline void RemoveLuaVM(lua_State* luaVM) { _luaStates.erase(luaVM); }
 	inline bool HasLuaVM(lua_State* luaVM) { return _luaStates.find(luaVM) != _luaStates.end(); }
 
-	inline void AddRedisClient(const std::shared_ptr<redis_client> client) { _redisClients.insert(client); }
-	inline void RemoveRedisClient(const std::shared_ptr<redis_client> client) { _redisClients.erase(client); }
-	inline bool HasRedisClient(const std::shared_ptr<redis_client> client) { return _redisClients.find(client) != _redisClients.end(); }
+	inline void AddRedisClient(const std::shared_ptr<redis_client>& client) { _redisClients.insert(client); }
+	inline void RemoveRedisClient(const std::shared_ptr<redis_client>& client) { _redisClients.erase(client); }
+	inline bool HasRedisClient(const std::shared_ptr<redis_client>& client) { return _redisClients.find(client) != _redisClients.end(); }
 
 	inline JobManager<const std::optional<std::any>>& GetJobManager() { return _jobManager; }
 
