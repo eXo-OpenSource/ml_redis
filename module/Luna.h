@@ -105,7 +105,11 @@ private:
 		char buff[32];
 		userdataType *ud = static_cast<userdataType*>(lua_touserdata(L, 1));
 		T *obj = ud->pT;
-		sprintf(buff, "%p", obj);
+#ifdef WINDOWS
+		sprintf_s(buff, "%p", obj);
+#else
+		snprintf(buff, "&p", obj);
+#endif
 		lua_pushfstring(L, "%s (%s)", T::className, buff);
 		return 1;
 	}

@@ -60,6 +60,51 @@ int LunaRedisClient::disconnect(lua_State* lua_vm)
 	return 1;
 }
 
+int LunaRedisClient::authenticate(lua_State* lua_vm)
+{
+	// Save function ref
+	const auto func_ref = utils::lua_getfuncref(lua_vm, 1);
+
+	// Read arguments
+	const auto password = luaL_checkstring(lua_vm, 2);
+
+	// verify client
+	verify_self(lua_vm);
+
+	try
+	{
+		_client->authenticate(password, [lua_vm = lua_getmainstate(lua_vm), func_ref](cpp_redis::reply& reply)
+		{
+			// Validate LuaVM (use ResourceStart/-Stop to manage valid lua states)
+			if (!g_Module->HasLuaVM(lua_vm))
+				return;
+
+			// Push stored reference to callback function to the stack
+			lua_rawgeti(lua_vm, LUA_REGISTRYINDEX, func_ref);
+
+			// Push the result
+			if(!reply.is_error())
+			{
+				lua_pushboolean(lua_vm, true);
+			} else
+			{
+				pModuleManager->ErrorPrintf("%s\n", reply.error().c_str());
+				lua_pushboolean(lua_vm, false);
+			}
+
+			// Finally, call the function
+			const auto err = lua_pcall(lua_vm, 1, 0, 0);
+			if (err != 0)
+				pModuleManager->ErrorPrintf("%s\n", lua_tostring(lua_vm, -1));
+		}, nullptr);
+	} catch (std::exception& e)
+	{
+		luaL_error(lua_vm, e.what());
+	}
+
+	return 1;
+}
+
 int LunaRedisClient::set(lua_State* lua_vm)
 {
 	// Save function ref

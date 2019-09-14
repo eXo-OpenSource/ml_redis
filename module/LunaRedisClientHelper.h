@@ -7,6 +7,7 @@ Luna<LunaRedisClient>::RegType LunaRedisClient::methods[] = {
 	// methods
 	method(LunaRedisClient, connect),
 	method(LunaRedisClient, disconnect),
+	method(LunaRedisClient, authenticate),
 	method(LunaRedisClient, get),
 	method(LunaRedisClient, set),
 	method(LunaRedisClient, subscribe),

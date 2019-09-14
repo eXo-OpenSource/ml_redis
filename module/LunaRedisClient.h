@@ -20,6 +20,7 @@ public:
 
 	int connect(lua_State* lua_vm);
 	int disconnect(lua_State* lua_vm);
+	int authenticate(lua_State* lua_vm);
 	int set(lua_State* lua_vm);
 	int get(lua_State* lua_vm);
 	int subscribe(lua_State* lua_vm);
